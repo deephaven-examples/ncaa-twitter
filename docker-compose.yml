@@ -1,0 +1,38 @@
+version: "3.4"
+
+services:
+  server:
+    image: ghcr.io/deephaven/server:0.9.0
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx6g -Ddeephaven.console.type=python
+    expose:
+      - '8080'
+    volumes:
+      - ./data/notebooks:/data/notebooks
+      - api-cache:/cache
+
+  web:
+    image: twitter-sentiment/ts-web
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx4g
+    expose:
+      - '80'
+    volumes:
+      - ./data/notebooks:/data/notebooks
+      - web-tmp:/tmp
+
+  grpc-proxy:
+    image: ghcr.io/deephaven/grpc-proxy:0.9.0
+    environment:
+      - BACKEND_ADDR=server:8080
+    expose:
+      - '8080'
+
+  envoy:
+    image: ghcr.io/deephaven/envoy:0.9.0
+    ports:
+      - "${PORT:-10000}:10000"
+
+volumes:
+    web-tmp:
+    api-cache:
