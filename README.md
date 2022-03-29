@@ -48,33 +48,10 @@ Running this script will start several Docker containers that work together to l
 
 [Twitter](https://developer.twitter.com/en/docs/twitter-api) provides an API to make it easy to pull public tweets. In order to use this code as-is, you need to also have a Twitter Developer account and copy your Bearer Token.
 
-```python
-import os
-os.system("pip install nltk")
-import nltk
-nltk.download('punkt')
-nltk.download('vader_lexicon')
-
-from requests_oauthlib import OAuth1Session
-import requests
-from datetime import datetime
-
-import time
-import re
-import json
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
-
-from deephaven.DateTimeUtils import convertDateTime, minus, convertPeriod, currentTime
-from deephaven import DynamicTableWriter
-import deephaven.Types as dht
-import threading
-```
 
 ### Run the program
 
-This program is intended to be fine-tuned to fit your data needs. Below are the values you'll need to change to customize the program for your specific use case and information.
-
-
+This program is intended to be fine-tuned to fit your data needs. As is this will pull in the live tweets for the NCAA teams.  It will perform sentiment on the tweets and aggregate the tweets to assess if that team is positive/negative to guide wins.
 
 ## Your turn
 

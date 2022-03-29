@@ -1,10 +1,13 @@
 def installations():
+    import os
+    os.system("pip install nltk")
     import nltk
     nltk.download('punkt')
     nltk.download('vader_lexicon')
+    import os
+    os.system("pip install requests")
 
-
-#installations()
+installations()
 
 from requests_oauthlib import OAuth1Session
 import requests
@@ -13,9 +16,11 @@ from datetime import datetime
 import time
 import re
 import json
+import textwrap
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from nltk import word_tokenize,sent_tokenize
+import requests
 
 
 import textwrap
@@ -27,6 +32,7 @@ import threading
 from deephaven.TableTools import newTable, stringCol
 from deephaven import Aggregation as agg, as_list
 from deephaven.conversion_utils import NULL_INT
+from deephaven.TableTools import newTable, intCol, stringCol
 
 
 
