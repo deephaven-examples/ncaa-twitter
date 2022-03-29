@@ -30,7 +30,7 @@ from deephaven.conversion_utils import NULL_INT
 
 
 
-bearer_token =  'AAAAAAAAAAAAAAAAAAAAAF%2FVNwEAAAAAPLT2s1dTOZIrj1NYoagNYVw61Ik%3Dxobdg7ZOOBxkWm7ct3xHCwMVApNcVkUQuKvKHYT3EHwYxOw7OM'
+bearer_token =  '<YOUR BEARER TOKEN>'
 # Max results per time bin, 10-100
 max_results = 100
 
