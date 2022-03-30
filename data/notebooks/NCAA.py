@@ -6,7 +6,8 @@ def installations():
     nltk.download('vader_lexicon')
     import os
     os.system("pip install requests")
-
+    os.system("pip install requests")
+    os.system("pip install requests_oauthlib")
 installations()
 
 from requests_oauthlib import OAuth1Session
@@ -21,6 +22,7 @@ import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from nltk import word_tokenize,sent_tokenize
 import requests
+from requests_oauthlib import OAuth1Session
 
 
 import textwrap
