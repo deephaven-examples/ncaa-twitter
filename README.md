@@ -38,7 +38,7 @@ A start script will install the needed python modules. It will also start the De
 To run it, execute:
 
 ```shell
-./ncaa-twitter.sh
+sh ncaa-twitter.sh
 ```
 
 Running this script will start several Docker containers that work together to launch Deephaven with the needed dependancies. To view the data navigate to [http://localhost:10000/ide](http://localhost:10000/ide).  To view the data you need to edit the `keys.py` file with your infomration.
