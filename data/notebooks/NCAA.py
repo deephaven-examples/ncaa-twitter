@@ -150,7 +150,7 @@ def write_data(all_text, tableWriter):
             reply_count = t['public_metrics']['reply_count']
             like_count = t['public_metrics']['like_count']
             quote_count= t['public_metrics']['quote_count']
-            tableWriter.logRowPermissive(t['text'].lower(), to_datetime(dateTime), int(retweet_count), int(reply_count), int(like_count), int(quote_count), t['id'])
+            tableWriter.write_row(t['text'].lower(), to_datetime(dateTime), int(retweet_count), int(reply_count), int(like_count), int(quote_count), t['id'])
   
         except TypeError:
             print("string indices must be integers")
