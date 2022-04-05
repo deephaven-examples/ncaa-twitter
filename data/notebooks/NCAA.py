@@ -18,6 +18,7 @@ import time
 import re
 import json
 import textwrap
+import threading
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from nltk import word_tokenize,sent_tokenize
@@ -25,16 +26,17 @@ import requests
 from requests_oauthlib import OAuth1Session
 
 
-import textwrap
 
-from deephaven.DateTimeUtils import convertDateTime, minus, convertPeriod, currentTime, plus
+
+from deephaven.time import to_datetime, now, plus_period, to_period
 from deephaven import DynamicTableWriter
-import deephaven.Types as dht
-import threading
-from deephaven.TableTools import newTable, stringCol
-from deephaven import Aggregation as agg, as_list
-from deephaven.conversion_utils import NULL_INT
-from deephaven.TableTools import newTable, intCol, stringCol
+import deephaven.dtypes as dht
+from deephaven import new_table
+from deephaven.column import string_col, int_col
+from deephaven import agg as agg
+from deephaven.constants import NULL_INT
+from threading import Thread
+
 
 
 
@@ -73,8 +75,9 @@ for element in temp_terms:
     search_terms.append(element)
 
 def make_table():
-    return newTable(stringCol("team", teams))
+    return new_table([string_col("team", teams)])
 teams_table = make_table()
+
 
 #twitter function to create header
 def create_headers(bearer_token):
@@ -147,7 +150,7 @@ def write_data(all_text, tableWriter):
             reply_count = t['public_metrics']['reply_count']
             like_count = t['public_metrics']['like_count']
             quote_count= t['public_metrics']['quote_count']
-            tableWriter.logRowPermissive(t['text'].lower(), convertDateTime(dateTime), int(retweet_count), int(reply_count), int(like_count), int(quote_count), t['id'])
+            tableWriter.logRowPermissive(t['text'].lower(), to_datetime(dateTime), int(retweet_count), int(reply_count), int(like_count), int(quote_count), t['id'])
   
         except TypeError:
             print("string indices must be integers")
@@ -157,8 +160,8 @@ def thread_func(search_terms, tableWriter):
     global max_id
     for i in range(1, time_bins):
         for search_term in search_terms:
-            start_time = str(plus(convertDateTime(str(currentTime())[:11]+'00:00:00.000 NY'),convertPeriod("T"+str(int(i-1))+"H")))[:-9]+'Z'
-            end_time = str(plus(convertDateTime(str(currentTime())[:11]+'00:00:00.000 NY'),convertPeriod("T"+str(int(i))+"H")))[:-9]+'Z'
+            start_time = str(plus_period(to_datetime(str(now())[:11]+'00:00:00.000 NY'),to_period("T"+str(int(i-1))+"H")))[:-9]+'Z'
+            end_time = str(plus_period(to_datetime(str(now())[:11]+'00:00:00.000 NY'),to_period("T"+str(int(i))+"H")))[:-9]+'Z'
             query_params = get_query_params_hist(search_term, start_time, end_time)
             all_text = get_tweets(query_params)
             max_id = write_data(all_text, tableWriter)
@@ -172,23 +175,24 @@ def thread_func(search_terms, tableWriter):
 
 def make_table(term):
     tableWriter = DynamicTableWriter(
-        ["Text", "DateTime", "Retweet_count", "Reply_count", "Like_count", "Quote_count", "Id"],
-        [dht.string, dht.datetime, dht.int_, dht.int_, dht.int_, dht.int_,dht.string])
-    thread = threading.Thread(target=thread_func, args=[term, tableWriter])
+        {"Text":dht.string, "DateTime":dht.DateTime, "Retweet_count":dht.int_, "Reply_count":dht.int_, "Like_count":dht.int_, "Quote_count":dht.int_, "Id":dht.string})
+    thread = Thread(target=thread_func, args=[term, tableWriter])
     thread.start()
-    return tableWriter.getTable()
+    return tableWriter.table
 
-data_sia= make_table(search_terms).update("Sentiment = (org.jpy.PyListWrapper)classifier(Text)",
+data_sia= make_table(search_terms).update(["Sentiment = (org.jpy.PyListWrapper)classifier(Text)",
     "Positive = (double)Sentiment[0]",
     "Neutral = (double)Sentiment[1]",
     "Negative = (double)Sentiment[2]",
-    "Compound = (double)Sentiment[3]").sortDescending("DateTime")
+    "Compound = (double)Sentiment[3]"]).sort_descending(["DateTime"])
 
 def match_text(text):
     return [ele for ele in teams if(ele in text)]
 
-tweet_matching = data_sia.update("team =  (org.jpy.PyListWrapper)match_text(Text)").where("(team).size()>0").update("team =(String)team[0]")
+tweet_matching = data_sia.update(["team =  (org.jpy.PyListWrapper)match_text(Text)"]).where(["(team).size()>0"]).update(["team =(String)team[0]"])
 
-teams_table_sia = teams_table.join(tweet_matching,"team=team", "Positive, Negative,Compound,Retweet_count")\
-    .sort("team")\
-    .aggBy(as_list([agg.AggAvg("Avg_Pos= Positive"),agg.AggAvg("Avg_Neg= Negative"),agg.AggAvg("Avg_Compound= Compound"),agg.AggAvg("Avg_retweet= Retweet_count"),agg.AggCount("Number_tweets")]), "team")
+
+teams_table_sia = teams_table.join(tweet_matching,["team=team"], ["Positive, Negative,Compound,Retweet_count"])\
+    .sort(["team"])\
+    .agg_by([agg.avg(["Avg_Pos= Positive"]),agg.avg(["Avg_Neg= Negative"]),agg.avg(["Avg_Compound= Compound"]),agg.avg(["Avg_retweet= Retweet_count"]),agg.count_("Number_tweets")], ["team"])
+
