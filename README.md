@@ -89,7 +89,7 @@ final_4_mens = ['dukembb', 'kuhoops', 'unc_basketball', 'novambb']
 final_4_womens =['stanfordwbb', 'gamecockwbb', 'uconnwbb', 'uoflwbb']
 ```
 
-There are some sample aggregates and plots to get you started. We look forward to seeing what you make on [Slack](https://join.slack.com/t/deephavencommunity/shared_invite/zt-11x3hiufp-DmOMWDAvXv_pNDUlVkagLQ)!
+There are some sample aggregates and plots to get you started. We look forward to seeing what you make on [Slack](https://deephaven.io/slack)!
 
 ## Related documentation
 
