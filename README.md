@@ -3,6 +3,8 @@
 This repository integrates [Deephaven](http://deephaven.io/) with [Twitter](https://twitter.com/) and [Python's Natural Language Toolkit (NLTK)](https://www.nltk.org/) to pull recent tweets and evaluate sentiment in real-time. We start by pulling the data and running a `SentimentIntensityAnalyzer` on each tweet. We then aggregate the posts to see the overall positivity or negativity of that term on Twitter with time.
  Running `./ncaa-twitter.sh` will create open deephaven on [http://localhost:10000/ide](http://localhost:10000/ide).
 
+The code in this repository is built for Deephaven Community Core v0.10.0. No guarantee of forwards or backwards compatibility is given. Additionally, the Twiiter API has changed since that release.
+
 ## How it works
 
 
